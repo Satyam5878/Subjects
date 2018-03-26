@@ -1,0 +1,286 @@
+
+### CONTING DISTINCT NO. OF COUNTRY
+select count(distinct country) from Customers;
+select count(*) from (select distinct Country from Customers) as p;
+
+### SELECTING CUSTOMERS FROM COUNTRY "MEXICO"
+select *
+from Customers
+where Country="Mexico";
+
+
+### SELECTING CUSTOMERS WITH PARTICULAR ID
+select *
+from Customers
+where CustomerID in (1,5,6);
+
+### FOR PATTERN MATCHING "LIKE"
+select *
+from Customers
+where City like "B%";
+
+
+### USE OF AND, OR, NOT
+select *
+from Customers
+where Country="Germany" AND City="Berlin";
+
+SELECT * FROM Customers
+WHERE City='Berlin' OR City='München';
+
+
+select *
+from Customers
+where not Country = "Germany"
+
+select *
+from Customers
+where  Country <> "Germany"
+
+select *
+from Customers
+where Country = "Germany" and (city="Berlin" or City='München');
+
+
+### ORDER BY 
+select * 
+from Customers
+order by Country ;
+        
+select * 
+from Customers
+order by Country desc,City asc;
+      
+### INSERT INTO
+INSERT INTO Customers (CustomerName, ContactName, Address, City, PostalCode, Country)
+VALUES ('Cardinal', 'Tom B. Erichsen', 'Skagen 21', 'Stavanger', '4006', 'Norway');
+
+INSERT INTO Customers (CustomerName, City, Country)
+VALUES ('Cardinal', 'Stavanger', 'Norway');
+
+
+
+### IS NULL
+select *
+from Customers
+where Address is null;
+
+### IS NOT NULL
+select *
+from Customers
+where Address is not null;
+
+
+### UPDATE 
+update Customers
+set CustomerName="Alfred Schmidt", City="Franfurt"
+where CustomerId=1;
+
+### DELETE
+delete from Customers
+where Country="Germany";
+
+### LIMIT, TOP, ROWNUM
+select * 
+from Customers
+limit 10;
+
+select * 
+from Customers
+limit 3*(select count(*) from Customers)/4;
+
+
+### Functions
+
+MIN:
+select MIN(Price) as CheapestPrice
+from Products;
+
+# finding product details of cheapest product
+select *
+from Products
+where Price = (select min(Price) as mp from Products);
+
+MAX:
+# finding product details of expensive product
+select *
+from Products
+where Price = (select max(Price) as mp from Products);
+
+COUNT:
+select count(*)
+from Products;
+
+AVG:
+select avg(Price) as AvgPrice
+from Products;
+
+SUM:
+select SUM(Quantity)
+from OrderDetails;
+
+### LIKE
+# all customer with name startswith "a"
+select *
+from Customers
+where CustomerName Like "A%"
+
+# all customer with name endswith "a"
+select *
+from Customers
+where CustomerName Like "%A"
+
+# all customer with name having "or" at any position
+select *
+from Customers
+where CustomerName Like "%or%"
+
+# all customer with name having r at second position
+select *
+from Customers
+where CustomerName Like "_r%"
+
+# all customer with name having atleast three character
+select *
+from Customers
+where CustomerName Like "___%"
+
+# all customer with name that does not start with "sa"
+select *
+from Customers
+where  CustomerName not Like "a%"
+
+
+
+### IN operator
+select *
+from Customers
+where Country in ("Germany","USA");
+
+select *
+from Customers
+where Country in (select Distinct Country from Suppliers);
+
+### BETWEEN 
+select *
+from Products
+where Price between 10 and 20;
+
+select *
+from Products
+where Price NOT between 10 and 20;
+
+### Aliases
+column aliases:
+select ProductID as pID, ProductName as pName
+from Products;
+
+# all the orders placed by Customer with id = 4
+select *
+from (select *
+      from Customers 
+      where CustomerID=4
+      ) c,
+      Orders o
+where c.CustomerID == o.CustomerID
+
+
+### JOIN
+select *
+from Orders join Customers
+order by OrderID;
+
+select *
+from  Orders  Inner join Customers
+;
+
+select *
+from Customers left join Orders;
+
+
+# Customer with same city
+select c1.CustomerName as c1Name,c2.CustomerName as c2Name
+from Customers c1 join Customers c2
+where c1.City = c2.City and c1.CustomerID <> c2.CustomerID;
+
+
+### UNION
+select distinct City
+from Customers
+union 
+select distinct City
+from Suppliers
+
+### Group by
+select Country,Count(CustomerID)
+from Customers
+group by Country;
+
+select Country,count(CustomerID) as cid
+from Customers
+group by Country
+order by cid;
+
+
+### HAVING
+#number of customers in each country. Only include countries with more than 5 customers:
+select Country, Count(CustomerID) 
+from Customers
+group by Country
+having Count(CustomerID) > 5;
+
+#number of customers in each country. Only include countries with more than 5 customers high to low:
+select Country, Count(CustomerID) 
+from Customers
+group by Country
+having Count(CustomerID) > 5
+order by Count(CustomerID) Desc;
+
+
+
+# employeeID of both
+select EmployeeID
+from Employees
+where LastName in ("Davolio","Fuller")
+
+
+select LastName,validity 
+from Employees as e,(select EmployeeID,Count(OrderID) > 25 as validity
+      from Orders
+      where EmployeeID in (select EmployeeID
+                           from Employees
+                           where LastName in ("Davolio","Fuller"))
+      group by EmployeeID) as r
+where e.EmployeeID = r.EmployeeID;
+
+# Supplier with product price < 20
+select *
+from Suppliers
+where SupplierID in (select Distinct SupplierID
+					 from Products
+ 					 where Price <20);
+
+select *
+from Suppliers
+where SupplierID in (select SupplierID
+			         from Products
+					 where Price == 22);
+                     
+                     
+# product with quantity 10 in orders                    
+select  ProductName
+from Products
+where ProductID in (select distinct ProductID
+                    from OrderDetails
+                    where Quantity = 10);
+
+select ProductName
+from Products
+where ProductID = ANY (select ProductID from OrderDetails where Quantity = 10 );
+
+# ProductName with quantity > 99
+select ProductName
+from Products
+where ProductID = Any (select ProductID from OrderDetails where Quantity >99)
+        
+
