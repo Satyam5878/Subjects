@@ -1,0 +1,6 @@
+Date 26/03/2018
+
+http://www.edugrabs.com/er-diagram-example/
+https://www.tutorialspoint.com/dbms/er_model_to_relational_model.htm
+https://www.studytonight.com/dbms/er-diagram.php
+https://www.lucidchart.com/pages/er-diagrams
